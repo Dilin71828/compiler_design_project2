@@ -16,6 +16,7 @@
 #include "IRPrinter.h"
 #include "type.h"
 
+
 namespace PARSE{
 
 // 类声明
@@ -49,15 +50,14 @@ namespace Global{
     std::string parse_string;
     int now_index; 
     int parse_string_size;
-    char op[] = {'+','-','*','/','%', '$'};
-    const int op_kind = 6;
+    char op[] = {'+','-','*','/','%'};
+    const int op_kind = 5;
     FileData* now_fileData;
     std::map<std::string, int> vlist;
     std::vector<int> clist;
     std::vector<std::string> clist_str;    
     int upbound;
     bool is_complex;
-    bool judge_upbound; // 是否需要判断存在上界(有无减号) // TODO ADD
 }
 
 
@@ -219,7 +219,7 @@ struct MyIdExpr{
 
 /**
  * IdExpr_A ::= OP IntV     (0)
-*             | OP IdExpr    (1)
+*             | + IdExpr    (1)
  */ 
 struct MyIdExpr_A{
     int type;
@@ -287,11 +287,9 @@ struct MyData{
     std::string outs;// 认为 outs 只有一个
     std::string data_type;
     std::string kernel;
-    std::vector<std::string> grad_to;
     MyData(){
         ins.clear();
         outs.clear();
-        grad_to.clear();
     }
 };
 
@@ -428,9 +426,6 @@ void visit_MyOP(MyOP* arg);
 FileData* get_fileData(MyP* p, MyData* data);
 
 ////////////////////////////////////////////////////////////////
-
-/// p2
-void complex2easy(std::string &str);
 
 //////////////////////
 // PARSE START
@@ -661,9 +656,7 @@ void parse_MyIdExpr_A(MyIdExpr_A* arg){
     }
     else{
         arg->type = 1;
-        // match('+');
-        arg->op = new MyOP();
-        parse_MyOP(arg->op);
+        match('+');
         arg->exp = new MyIdExpr();
         parse_MyIdExpr(arg->exp);
     }
@@ -840,20 +833,11 @@ void visit_MyAList (MyAList* arg){
             Global::now_fileData->judge[Global::now_index].push_back(arg->origin_expr[i]);
             Global::now_fileData->judge_upbound[Global::now_index].push_back(Global::clist_str[i]);
         }
-        // 如果当前语句中含有减号,则不进行上界判断
-        // 投机,输入中没有括号
-        Global::judge_upbound = true;
-        for(int j = 0;j < arg->node[i]->expa.size(); ++j){
-            if(arg->node[i]->expa[j]->op->type == 1){
-                Global::judge_upbound = false;
-                break;
-            }
-        }
         visit_MyIdExpr(arg->node[i]);
     }
 }
 
-void visit_MyIdExpr(MyIdExpr* arg){    
+void visit_MyIdExpr(MyIdExpr* arg){
     visit_MyIdExpr_B(arg->expb);
     int size = arg->expa.size();
     for(int i = 0;i < size;++i){
@@ -884,18 +868,16 @@ void visit_MyIdExpr_A(MyIdExpr_A* arg){
 
 void visit_MyIdExpr_B(MyIdExpr_B* arg){
     if(arg->type == 0){
-        if(Global::judge_upbound) {
-            std::string id = arg->id;
-            // exsits
-            if(Global::vlist.find(id) != Global::vlist.end()){
-                if(Global::upbound < Global::vlist[id])
-                    Global::vlist[id] = Global::upbound;
-            }
-            // set it
-            else{
+        std::string id = arg->id;
+        // exsits
+        if(Global::vlist.find(id) != Global::vlist.end()){
+            if(Global::upbound < Global::vlist[id])
                 Global::vlist[id] = Global::upbound;
-                Global::now_fileData->variable[Global::now_index].push_back(id);
-            }
+        }
+        // set it
+        else{
+            Global::vlist[id] = Global::upbound;
+            Global::now_fileData->variable[Global::now_index].push_back(id);
         }
     }
     else{
@@ -943,7 +925,6 @@ void clearBlank(std::string &str){
             // 消除整除符号
             if(str[i] == '/' && i+1 < size  && str[i+1] == '/'){
                 ++i;
-                t[index] = '$';
             }
         }
     }
@@ -968,7 +949,7 @@ MyData get_data(std::string filename){
     MyData ret;
     std::string temp;
     char tempc[1024];// 认为 kernel 长度不超过 1024
-    for(int i = 0; i < 8; ++i){
+    for(int i = 0; i < 7; ++i){
         in.getline(tempc, 1024);
         temp = std::string(tempc);
         int lindex, rindex;
@@ -1022,27 +1003,6 @@ MyData get_data(std::string filename){
             strip(temp);
             ret.data_type = temp;
         } 
-        else if(temp.find("\"grad_to\"") != -1){
-            lindex = temp.find("[") + 1;
-            rindex = temp.find("]");
-            temp = temp.substr(lindex, rindex - lindex);
-            rindex = -1;
-            while(true){
-                lindex = rindex + 1;
-                rindex = temp.find(",", lindex);
-                if(rindex != -1){
-                    std::string t = temp.substr(lindex, rindex - lindex);
-                    strip(t);
-                    ret.grad_to.push_back(t);
-                }
-                else{
-                    std::string t = temp.substr(lindex, temp.size() - lindex);
-                    strip(t);
-                    ret.grad_to.push_back(t);
-                    break;
-                }
-            }
-        }
     }
     return ret;
 }
@@ -1065,6 +1025,7 @@ void test(std::vector<MyData>& datas){
 
 // 获取文件夹下的所有文件名
 void get_file_list(std::vector<std::string>& file_name, const char* dir_name){
+    std::cout << "start getting files from " << dir_name << std::endl;
     // 打开文件夹
     DIR* dir;
     if((dir = opendir(dir_name)) == nullptr){
@@ -1100,7 +1061,7 @@ void parse_file(std::vector<MyData>& datas){
 
     // 解析
     int size = file_name.size();
-    for(int i = 0; i < size ; ++i){ 
+    for(int i = 0; i < size ; ++i){
         datas.push_back(get_data("./cases/" + file_name[i]));
     }
 }
@@ -1199,7 +1160,7 @@ void split_p(MyData &data, std::vector<std::string> &temp_definition){
             }
             else if(tmp01 == '<'){
                 shape_start = j;
-                index_for_t = 0;
+                index_for_t=0;
                 t[index_for_t ++] = '[';                
             }
             else if(tmp01 == ','){
@@ -1262,469 +1223,6 @@ void split_p(MyData &data, std::vector<std::string> &temp_definition){
     data.kernel = new_kernel;
 }
 
-// project2 start
-
-// 是否为常数
-bool is_constant(std::string &str){
-    int size = str.size();
-    for(int i = 0; i < size; ++i){
-        if(str[i] != '.' && !is_digit(str[i]))
-        return false;
-    }
-    return true;
-}
-
-// 删除常数,常数必须以单独的加法或者减法出现
-void clear_constant(std::string &old){
-    int start =  old.find('=') + 1;
-    int equal_pos_plus_1 = start;
-    // 注意 substr(start, length)
-    int size = old.size();
-    int now = start - 1;
-    int open = 0;// 表示是否匹配上括号,若匹配上,说明不是单独的常数
-    std::vector<std::string> constant_to_replace;// 记录需要替换的常数
-    std::vector<int> constant_pos;// 记录需要替换常数的位置
-    constant_to_replace.clear();
-    constant_pos.clear();
-    std::string long_blank(20, ' ');// 认为常数长度不超过20
-    while(++now < size){
-        char tempc = old[now];
-        if(tempc == '(' || tempc == '[' || tempc == '<'){
-            ++open;
-        }
-        else if(tempc == ')' || tempc == ']' || tempc == '>'){
-            --open;
-            if(open == 0){
-                int skip = 1;
-                // skip a op(+/-)
-                if(old[now + 1] == '+' || old[now + 1] == '-') ++skip;
-                start = now + skip;
-            }
-        }
-        else if(tempc == '+' || tempc == '-'){
-            // 可能出现由右括号更新的情况(now>start -> OK)
-            if(open != 0 || now <= start){
-                continue;
-            }
-            std::string temp_str = old.substr(start, now - start);
-            if(is_constant(temp_str)) {
-                if(old[start - 1] != '=') {
-                    temp_str = old[start - 1] + temp_str;
-                    --start;
-                }
-                constant_to_replace.push_back(temp_str);
-                constant_pos.push_back(start);
-            }
-            start = now + 1;
-        }
-        else if(tempc == ';'){
-            // 表示结尾
-            // 可能出现由右括号更新的情况(now>start -> OK)
-            if(now <= start){
-                continue;
-            }
-            std::string temp_str = old.substr(start, now - start);
-            if(is_constant(temp_str)) {
-                if(old[start - 1] != '=') {
-                    temp_str = old[start - 1] + temp_str;
-                    --start;
-                }
-                constant_to_replace.push_back(temp_str);
-                constant_pos.push_back(start);
-            }
-        }
-    }
-    // 替换
-    for(int i = 0;i < constant_to_replace.size(); ++i){
-        old.replace(constant_pos[i], constant_to_replace[i].size(),
-            long_blank, 0, constant_to_replace[i].size()); 
-    }
-    clearBlank(old);
-    if(old[equal_pos_plus_1] == '+'){
-        old.replace(equal_pos_plus_1, 1, "", 0, 0);
-    }
-    if(old[equal_pos_plus_1] == '-'){
-        old.replace(equal_pos_plus_1, 1, "0-", 0, 2);
-    }
-}
-
-// 乘法分配律
-void distribute(std::string &str){
-    int size = str.size();
-    // 检验是否需要初始化
-    std::string new_str = "";
-    int equal_pos = str.find('=');
-    int r = 0;
-    while(str[r] != '<') ++r;
-    std::string out = str.substr(0, r);
-    std::string out_all = str.substr(0, equal_pos);
-    // 从后往前找到的第一个out为开头,说明右边没有用到out,可以初始化
-    if(str.find_last_of(out) == 0){
-        new_str += out_all + "=0;";
-    }
-    // 分配律,这里只考虑最简单的情况(exp+exp-exp)/exp2
-    // 认为 exp2 就是简单的数组访问/数字,不含括号
-    int bracket = 0, l_for_bracket, r_for_bracket;
-    // 找到括号
-    for(int i = equal_pos + 1; i < size; ++i){
-        if(str[i] == '('){
-            if(++bracket == 1) 
-                l_for_bracket = i;
-        }
-        else if(str[i] == ')'){
-            if(--bracket == 0){
-                r_for_bracket = i;
-                break;
-            }
-        }
-    }
-    // 括号处理 + 拼接
-    std::string l_str = str.substr(0, l_for_bracket) + out_all;
-    std::string r_str = str.substr(r_for_bracket + 1, size - r_for_bracket - 1);
-    int l_for_trunc = l_for_bracket + 1;
-    // 其实不需要初始化, 保证为0
-    bracket = 0;
-    for(int i = l_for_bracket + 1;i < r_for_bracket; ++i){
-        if(str[i] == '(' || str[i] == '[' || str[i] == '<') ++bracket;
-        else if(str[i] == ')' || str[i] == ']' || str[i] == '>') -- bracket;
-        else{
-            if(bracket != 0) continue;
-            if(str[i] == '+' || str[i] == '-'){
-                char op = str[l_for_trunc - 1];
-                // if(op != '-' && op != '+') op = '+';
-                if(op != '-') op = '+';
-                new_str += l_str + op + str.substr(l_for_trunc, i - l_for_trunc) + r_str;
-                l_for_trunc = i + 1;
-            }
-        }
-    }
-    // 处理最后一个
-    // 一定自带符号
-    new_str += l_str 
-        + str.substr(l_for_trunc - 1, r_for_bracket - l_for_trunc + 1) 
-        + r_str;
-    // update
-    str = new_str;
-}
-
-// 生成偏导的语句
-// 这里的引用只是为了快
-std::string generate(const std::string &deal_str,
-    const std::string grad_to, const std::string out){
-    // 1. C = A*B      ->  dA = dC*B
-    // 2. C = C + A*B  ->  dA = dA + dC*B
-    //    因为进行了拆分,而且 dA 初始化为0,因此就算多了一步也没事
-    // 3. C = A*A      -> dA = dC*A + A*dC
-
-    std::string str_ret = "";
-    int equal_pos = deal_str.find('=');
-    // 记录 id 到整个结构(id<>[])的映射
-    std::string out_d = "d" + deal_str.substr(0, equal_pos);
-    int size_out_d = out_d.size();
-    // 下标全为简单的个数
-    // std::string grad_to_d_empty;
-    
-    // grad_to 的位置
-    // 找到第一个 grad_to 的位置
-    int l = deal_str.find(grad_to), r = 0;
-    int size = deal_str.size();
-    bool first = true;
-    while(l != -1){
-        r = l;
-        // 找到右边界
-        for(++r;r<size;++r){
-            if(deal_str[r] == ']')
-                break;
-        }
-        // replace
-        std::string grad_to_d = "d" + deal_str.substr(l , r + 1 - l);
-        // 默认 deep copy
-        std::string str_temp = deal_str;
-        /**
-         * string& replace (
-         *   size_t pos, size_t len, const string& str, size_t subpos, size_t sublen
-         * );
-         */
-
-        // grad_to -> out_d
-        // 一个
-        str_temp.replace(l, r + 1 - l , out_d, 0, size_out_d);
-        // out -> grad_to_d
-        // 多个
-        int l_for_out_d = 0;
-        int size_grad_to_d = grad_to_d.size();
-        while(l_for_out_d != -1){
-            // -1 因为没有 d
-            str_temp.replace(l_for_out_d, size_out_d - 1,  grad_to_d, 0, size_grad_to_d);
-            // 可能是第一次的 replace 导致的
-            while(true){
-                // +2 因为还有 d(但是实际上是不同的字母,+1问题也不大)
-                l_for_out_d = str_temp.find(out, l_for_out_d + 2);
-                if(str_temp[l_for_out_d - 1] != 'd') break;
-            }
-        }
-        if(first) first = false;
-        else{
-            // 说明是 C=A*A 的形式(一个式子生成多个表达式)
-            // dA = dC*A
-            // dA = A*dC+dA
-            str_temp.insert(str_temp.size()-1,"+" + grad_to_d);
-        }
-        complex2easy(str_temp);
-        str_ret += str_temp;
-        // 更新 l 
-        // +2 因为还有 d(但是实际上是不同的字母,+1问题也不大)
-        l = deal_str.find(grad_to, l + 2);
-    }
-    return str_ret;
-}
-
-// 处理整除符号 '$'->'/'
-void map_divisible(std::string &str){
-    int size = str.size();
-    for(int i = 0; i < size; ++i){
-        if(str[i] == '$')
-            str[i] = '/';
-    }
-}
-
-// 是否为不带 op 的语句
-bool is_easy(std::string &str){
-    int size = str.size();
-    for(int i = 0;i < size; ++i){ 
-        if(is_op(str[i]))
-            return false;
-    }
-    return true;
-}
-
-// 判断是否为边界
-bool is_border(char c){
-    if(c == ',' || c == '[' || c == ']')
-        return true;
-    return false;
-}
-
-// 将左边的复合下标拆解
-void complex2easy(std::string &str) {
-    // 认为复合语句只是包含 + 或者 /,%
-    // 认为左边出现的每一个式子在右边都会出现
-    char index_for_use = 'a';
-    int l_bracket = str.find('[') + 1;
-    int r_bracket = str.find(']');
-    // 记录更新映射
-    std::map<std::string, std::string> old2new;
-    old2new.clear();
-    int mod_pos = str.find('%'), div_pos = str.find('$');
-    if (mod_pos != -1 || div_pos != -1) {
-        // TODO 认为 a//b,c%d => a=c,b=d
-        std::string str_mod_l, str_mod_r, str_div_l, str_div_r;
-        // 垃圾代码
-        if (mod_pos != -1) {
-            for (int i = mod_pos;; --i) {
-                if (is_border(str[i])) {
-                    str_mod_l = str.substr(i + 1, mod_pos - i - 1);
-                    break;
-                }
-            }
-            for (int i = mod_pos;; ++i) {
-                if (is_border(str[i])) {
-                    str_mod_r = str.substr(mod_pos + 1, i - mod_pos - 1);
-                    break;
-                }
-            }
-        }
-        if (div_pos != -1) {
-            for (int i = div_pos;; --i) {
-                if (is_border(str[i])) {
-                    str_div_l = str.substr(i + 1, div_pos - i - 1);
-                    break;
-                }
-            }
-            for (int i = div_pos;; ++i) {
-                if (is_border(str[i])) {
-                    str_div_r = str.substr(div_pos + 1, i - div_pos - 1);
-                    break;
-                }
-            }
-        }
-        if (mod_pos != -1 && div_pos != -1) {
-            if (str_div_r != str_mod_r || str_div_l != str_mod_l) {
-                std::cerr << "The code can't hold the exp:" + str << std::endl;
-                exit(4);
-            }
-        }
-        std::string l_map = "";
-        // 若有乘法就更新
-        if (div_pos != -1) {
-            std::string str_div = str_div_l + "$" + str_div_r;
-            std::string new_index = std::string("__") + (index_for_use++);
-            int start_find = 0;
-            // replace all
-            while ((start_find = str.find(str_div, start_find)) != -1) {
-                str.replace(start_find, str_div.size(), new_index, 0, new_index.size());
-                ++start_find;
-            }
-            l_map += new_index  + "*" + str_div_r;
-        }
-        // 若有取模,再次更新
-        if (mod_pos != -1) {
-            std::string str_mod = str_mod_l + "%" + str_mod_r;
-            std::string new_index = std::string("__") + (index_for_use++);
-            int start_find = 0;
-            // replace all
-            while ((start_find = str.find(str_mod, start_find)) != -1) {
-                str.replace(start_find, str_mod.size(), new_index, 0, new_index.size());
-                ++start_find;
-            }
-            if (div_pos == -1) l_map = new_index + "+" + str_mod_r;
-            else l_map += "+" + new_index;
-            if (div_pos == -1) l_map = str_mod_r + l_map;
-        }
-        // 替换
-        int start_find = 0;
-        std::string old_index = (mod_pos == -1) ? str_div_l : str_mod_l;
-        // replace all
-        while ((start_find = str.find(old_index, start_find)) != -1) {
-            str.replace(start_find, old_index.size(), l_map, 0, l_map.size());
-            ++start_find;
-        }
-    }
-    else {
-        int l = l_bracket;
-        for (int i = l_bracket; i <= r_bracket; ++i) {
-            if (str[i] != ',' && i != r_bracket) continue;
-            std::string str_replace = str.substr(l, i - l);
-            l = i + 1;
-            if (is_easy(str_replace)) continue;
-            // complex
-            // 统计这个复合结构中所有的因子
-            std::vector<std::string> seg;
-            seg.clear();
-            int l_seg = 0;
-            for (int j = 0; j < str_replace.size(); ++j) {
-                if (str_replace[j] == '+') {
-                    seg.push_back(str_replace.substr(l_seg, j - l_seg));
-                    l_seg = j + 1;
-                }
-            }
-            seg.push_back(str_replace.substr(l_seg, str_replace.size()));
-            // 找到所有的映射
-            int seg_size = seg.size();
-            std::string new_index = std::string("__") + (index_for_use++);
-            for (int j = 0; j < seg_size; ++j) {
-                std::string new_map_index = new_index;
-                for (int k = 0; k < seg_size; ++k) {
-                    if (j != k) new_map_index += '-' + seg[k];
-                }
-                old2new[seg[j]] = new_map_index;
-            }
-            // 首先更新
-            int start_find = 0;
-            while ((start_find = str.find(str_replace, start_find)) != -1) {
-                str.replace(start_find, str_replace.size(), new_index, 0, new_index.size());
-                ++start_find;
-            }
-            // 更新剩下的(注意只更新简单的,不然会重复更新)
-            bool has_chosen = false;
-            for (int j = seg_size - 1; j >= 0 ; --j) {
-                if(is_constant(seg[j])) continue;
-                if(has_chosen) break;
-                else has_chosen = true;
-                start_find = 0;
-                while ((start_find = str.find(seg[j], start_find)) != -1) {
-                    // 简单的要求两边为 ',', '[', ']'
-                    if (is_border(str[start_find - 1]) && is_border(str[start_find + seg[j].size()])) {
-                        std::string new_index_other = old2new[seg[j]];
-                        str.replace(start_find, seg[j].size(),
-                            new_index_other, 0, new_index_other.size());
-                    }
-                    ++start_find;
-                }
-            }
-            // TODO 合并同项 (a+b-b -> a)
-        }
-    }
-}
-
-// project 2
-void change_kernel(MyData &data){
-    std::string new_kernel = "";
-    // 处理多条语句,但是实际上样例中只有一个语句
-    std::string old_kernel = data.kernel;
-    int l = 0, r = 0;
-    while(r != old_kernel.size()){
-        l = r;
-        r = old_kernel.find(';', l) + 1;
-        std::string deal_str = old_kernel.substr(l, r - l);
-        // 删除常数
-        clear_constant(deal_str);
-        // TODO 处理加法(会影响到 distribute 语句, distribute 默认一条一个语句)
-        // ex : A = B*C + B*D => A = B*C; A = A + B*D
-        // 注意现在的 kernel 还有整除符号(/) 不用管他
-        // 判断是否有括号,如果有需要考虑分配律
-        bool has_bracket = (deal_str.find("(") != -1);
-        if(has_bracket){
-            distribute(deal_str);
-        }
-        // 注意此时的 kernel 里面可能含有多个语句
-        // 认为 out 只有一个
-        // 生成偏导语句
-        std::string temp_str = "";
-        int l_for_gen = 0, r_for_gen = 0;
-        while(r_for_gen != deal_str.size()){
-            l_for_gen = r_for_gen;
-            r_for_gen = deal_str.find(';', l_for_gen) + 1;
-            std::string temp_str_gen = deal_str.substr(l_for_gen, r_for_gen - l_for_gen);
-            for(int i = 0; i < data.grad_to.size(); ++i){
-                // 考虑 C = B 的情况
-                // TODO 特殊处理 C = 0 的语句(现在是不处理,因为有初始化)
-                int equal_pos_plus_1 = temp_str_gen.find('=') + 1;
-                // -1 表示去掉标点 ';'
-                std::string constant
-                        = temp_str_gen.substr(
-                            equal_pos_plus_1, temp_str_gen.size()- equal_pos_plus_1 - 1
-                        );
-                if(is_constant(constant)){
-                    // 注意有 ';'
-                    if(constant.size() == 1 && constant[0] == '0'){
-                        continue;
-                    }
-                    else{
-                        std::cerr << "The solution has bug! Constant should be 0!" << std::endl;
-                        exit(3);
-                    }
-                }
-                // 处理无关语句 C = B
-                if(constant.find(data.grad_to[i]) == -1)
-                    continue;
-                std::string str_debug = temp_str_gen;                
-                // deal
-                temp_str += generate(temp_str_gen, data.grad_to[i], data.outs);
-            }
-        }
-        map_divisible(new_kernel);
-        new_kernel += temp_str;
-    }
-    // update kernel
-    data.kernel = new_kernel;
-}
-// project2 end
-
-// DEBUG
-void print_kernel(std::vector<PARSE::MyData> &datas){
-    for(int i = 0;i < datas.size(); ++i){
-        std::cout << "\t|" <<  datas[i].name << "|" << std::endl;
-        std::string ker = datas[i].kernel;
-        int l = 0, r = 0;
-        while(l != ker.size()){
-            r = ker.find(';', l) + 1;
-            std::cout << ker.substr(l ,r - l) << std::endl;
-            l = r;
-        }
-    }
-}
-
 }
 
 
@@ -1764,10 +1262,8 @@ namespace PRINT
                 {
                     Expr index_name = StringImm::make(index_type, data->judge[i][j]);
                     Expr upbound = StringImm::make(index_type, data->judge_upbound[i][j]);
-                    Expr cmp1 = Compare::make(index_type, CompareOpType::LT, index_name, upbound);
-                    Expr cmp2 = Compare::make(index_type, CompareOpType::GE, index_name, 0);
-                    judges.push_back(cmp1);
-                    judges.push_back(cmp2);
+                    Expr cmp = Compare::make(index_type, CompareOpType::LT, index_name, upbound);
+                    judges.push_back(cmp);
                 }
                 std::vector<Expr> conds;
                 conds.push_back(judges[0]);
@@ -1808,7 +1304,7 @@ namespace PRINT
     }
 
 } // namespace PRINT
-
+//namespace PRINT end
 
 ////////////
 ////////////
@@ -1816,8 +1312,9 @@ namespace PRINT
 ////////////
 ////////////
 
-// TODO mark for main
 int main(){
+    std::cout << "solution begin" << std::endl;
+    
     // all_list 记录所有的 P
     std::vector<PARSE::MyP*> all_list;
     all_list.clear();
@@ -1838,19 +1335,6 @@ int main(){
     PARSE::parse_file(datas);
     PARSE::parse_function_head(function_head, output_filename);
     
-    // 文件个数
-    int size = output_filename.size();
-
-    // TODO project2
-    // 修改 kernel
-    // DEBUG
-    // PARSE::print_kernel(datas);
-    for(int i = 0; i < size; ++i){
-        PARSE::change_kernel(datas[i]);
-    }
-    // DEBUG
-    PARSE::print_kernel(datas);
-    // exit(4);
     // test(datas);
     // 将 P 进行切分
     /**
@@ -1869,6 +1353,7 @@ int main(){
      *   temp[i] = temp[i] + c[k];
      *   a[i] = temp[i];
     */
+    int size = output_filename.size();
     PARSE::TEMP_Definition* temp_definition = new PARSE::TEMP_Definition(size);
     for(int i = 0; i < size; ++i){
         PARSE::split_p(datas[i], temp_definition->definition[i]);
@@ -1924,7 +1409,6 @@ int main(){
         ofs << "}\n";
         ofs.close();
     }
-
 
     // 释放空间
     // TODO

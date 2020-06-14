@@ -51,22 +51,42 @@ std::string IRPrinter::print(const Group &group) {
 
 
 void IRPrinter::visit(Ref<const IntImm> op) {
-    oss << "(" << op->type() << " " << op->value() << ")";
+    if (print_type)
+        oss << "(" << op->type() << " " << op->value() << ")";
+    else
+    {
+        oss << op->value();
+    }
+    
 }
 
 
 void IRPrinter::visit(Ref<const UIntImm> op) {
-    oss << "(" << op->type() << " " << op->value() << ")";
+    if (print_type)
+        oss << "(" << op->type() << " " << op->value() << ")";
+    else
+    {
+        oss << op->value();
+    }
+    
+    
 }
 
 
 void IRPrinter::visit(Ref<const FloatImm> op) {
-    oss << "(" << op->type() << " " << op->value() << ")";
+    if (print_type)
+        oss << "(" << op->type() << " " << op->value() << ")";
+    else
+        oss << op->value();
+    
 }
 
 
 void IRPrinter::visit(Ref<const StringImm> op) {
-    oss << "(" << op->type() << " " << op->value() << ")";
+    if (print_type)
+        oss << "(" << op->type() << " " << op->value() << ")";
+    else
+        oss << op->value();
 }
 
 
@@ -216,14 +236,27 @@ void IRPrinter::visit(Ref<const Index> op) {
     }
 }
 
+void IRPrinter::visit(Ref<const myIndex> op)
+{
+    if (print_range){
+        oss << "int " << op->name << " = ";
+        (op->begin).visit_expr(this);
+        oss << "; " << op->name << " < ";
+        (op->end).visit_expr(this);
+        oss << "; " << op->name << "++";
+    }
+    else{
+        oss << op->name;
+    }
+}
 
 void IRPrinter::visit(Ref<const LoopNest> op) {
     print_range = true;
     for (auto index : op->index_list) {
         print_indent();
-        oss << "for ";
+        oss << "for( ";
         index.visit_expr(this);
-        oss << "{\n";
+        oss << "){\n";
         enter();
     }
     print_range = false;
@@ -283,6 +316,13 @@ void IRPrinter::visit(Ref<const Move> op) {
     }
     oss << "> ";
     (op->src).visit_expr(this);
+    oss << "\n";
+}
+
+
+void IRPrinter::visit(Ref<const String_Stmt> op){
+    print_indent();
+    (op->value).visit_expr(this);
     oss << "\n";
 }
 

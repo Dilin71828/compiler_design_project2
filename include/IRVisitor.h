@@ -47,10 +47,12 @@ class IRVisitor {
     virtual void visit(Ref<const Cast>);
     virtual void visit(Ref<const Ramp>);
     virtual void visit(Ref<const Index>);
+    virtual void visit(Ref<const myIndex>);
     virtual void visit(Ref<const Dom>);
     virtual void visit(Ref<const LoopNest>);
     virtual void visit(Ref<const IfThenElse>);
     virtual void visit(Ref<const Move>);
+    virtual void visit(Ref<const String_Stmt>);
     virtual void visit(Ref<const Kernel>);
  private:
 };

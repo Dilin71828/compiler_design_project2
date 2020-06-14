@@ -33,6 +33,7 @@ bool test_case1(std::mt19937 &gen, std::uniform_real_distribution<float> &dis) {
         return false;
     }
 
+    
     // check
     for (int i = 0; i < 4; ++i) {
         for (int j = 0; j < 16; ++j) {
@@ -249,6 +250,7 @@ bool test_case5(std::mt19937 &gen, std::uniform_real_distribution<float> &dis) {
     // correct
     return true;
 }
+
 
 
 bool test_case6(std::mt19937 &gen, std::uniform_real_distribution<float> &dis) {

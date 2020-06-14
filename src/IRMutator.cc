@@ -134,6 +134,12 @@ Expr IRMutator::visit(Ref<const Index> op) {
     return Index::make(op->type(), op->name, new_dom, op->index_type);
 }
 
+Expr IRMutator::visit(Ref<const myIndex> op){
+    Expr new_begin = mutate(op->begin);
+    Expr new_end = mutate(op->end);
+    return myIndex::make(op->type(), op->name, new_begin, new_end);
+}
+
 
 Stmt IRMutator::visit(Ref<const LoopNest> op) {
     std::vector<Expr> new_index_list;
@@ -160,6 +166,12 @@ Stmt IRMutator::visit(Ref<const Move> op) {
     Expr new_dst = mutate(op->dst);
     Expr new_src = mutate(op->src);
     return Move::make(new_dst, new_src, op->move_type);
+}
+
+
+Stmt IRMutator::visit(Ref<const String_Stmt> op){
+    Expr new_value=mutate(op->value);
+    return String_Stmt::make(new_value);
 }
 
 

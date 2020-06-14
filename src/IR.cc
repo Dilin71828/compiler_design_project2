@@ -99,6 +99,10 @@ Expr Index::mutate_expr(IRMutator *mutator) const {
     return mutator->visit(Ref<const Index>(shared_from_this()));
 }
 
+Expr myIndex::mutate_expr(IRMutator *mutator) const{
+    return mutator->visit(Ref<const myIndex>(shared_from_this()));
+}
+
 
 Stmt LoopNest::mutate_stmt(IRMutator *mutator) const {
     return mutator->visit(Ref<const LoopNest>(shared_from_this()));
@@ -112,6 +116,11 @@ Stmt IfThenElse::mutate_stmt(IRMutator *mutator) const {
 
 Stmt Move::mutate_stmt(IRMutator *mutator) const {
     return mutator->visit(Ref<const Move>(shared_from_this()));
+}
+
+
+Stmt String_Stmt::mutate_stmt(IRMutator *mutator) const{
+    return mutator->visit(Ref<const String_Stmt>(shared_from_this()));
 }
 
 
@@ -192,6 +201,10 @@ void Index::visit_node(IRVisitor *visitor) const {
     return visitor->visit(Ref<const Index>(shared_from_this()));
 }
 
+void myIndex::visit_node(IRVisitor *visitor) const{
+    return visitor->visit(Ref<const myIndex>(shared_from_this()));
+}
+
 
 void LoopNest::visit_node(IRVisitor *visitor) const {
     return visitor->visit(Ref<const LoopNest>(shared_from_this()));
@@ -205,6 +218,11 @@ void IfThenElse::visit_node(IRVisitor *visitor) const {
 
 void Move::visit_node(IRVisitor *visitor) const {
     return visitor->visit(Ref<const Move>(shared_from_this()));
+}
+
+
+void String_Stmt::visit_node(IRVisitor *visitor) const{
+    return visitor->visit(Ref<const String_Stmt>(shared_from_this()));
 }
 
 

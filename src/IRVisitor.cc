@@ -117,6 +117,12 @@ void IRVisitor::visit(Ref<const Index> op) {
     return;
 }
 
+void IRVisitor::visit(Ref<const myIndex> op) {
+    (op->begin).visit_expr(this);
+    (op->end).visit_expr(this);
+    return;
+}
+
 
 void IRVisitor::visit(Ref<const LoopNest> op) {
     for (auto index : op->index_list) {
@@ -140,6 +146,11 @@ void IRVisitor::visit(Ref<const IfThenElse> op) {
 void IRVisitor::visit(Ref<const Move> op) {
     (op->dst).visit_expr(this);
     (op->src).visit_expr(this);
+    return;
+}
+
+void IRVisitor::visit(Ref<const String_Stmt> op){
+    (op->value).visit_expr(this);
     return;
 }
 

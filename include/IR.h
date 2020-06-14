@@ -68,7 +68,7 @@ class Ref {
     template<typename U, typename std::enable_if<std::is_base_of<T, U>::value>::type* = nullptr>
     Ref(std::shared_ptr<U> _ptr) : ptr(_ptr) {}
 
-    bool defined() const { return ptr != nullptr; }
+    bool defined() { return ptr != nullptr; }
 
     T *get() const { return ptr.get(); }
 
@@ -113,6 +113,7 @@ enum class IRNodeType : short {
     LoopNest,
     IfThenElse,
     Move,
+    String_Stmt,
     // Exprs
     Unary,
     Binary,
@@ -127,7 +128,8 @@ enum class IRNodeType : short {
     UIntImm,
     FloatImm,
     StringImm,
-    Dom
+    Dom,
+    myIndex
 };
 
 
@@ -378,11 +380,6 @@ class Expr : public Ref<const ExprNode> {
 
     Expr(double value) :
         Ref<const ExprNode>(FloatImm::make(Type::float_scalar(64), value)) {}
-
-    Expr &operator=(const Expr &other) {
-        this->set_ptr(other.real_ptr());
-        return *this;
-    }
 
     IRNodeType node_type() const {
         return this->get()->node_type();
@@ -792,6 +789,27 @@ class Index : public ExprNode, public std::enable_shared_from_this<Index> {
     static const IRNodeType node_type_ = IRNodeType::Index;
 };
 
+/******************changed by WangYinHao*************************/
+/**
+ * iteration index using in c++ code
+ */
+class myIndex : public ExprNode, public std::enable_shared_from_this<myIndex> {
+public:
+    std::string name;
+    Expr begin;
+    Expr end;
+
+    myIndex(Type _type, const std::string &_name, Expr _begin, Expr _end):
+        ExprNode(_type, IRNodeType::myIndex), name(_name), begin(_begin), end(_end) {}
+    Expr mutate_expr(IRMutator *mutator) const;
+    void visit_node(IRVisitor *visitor) const;
+
+    static Expr make(Type t, const std::string &_name, Expr _begin, Expr _end){
+        return std::make_shared<const myIndex>(t, _name, _begin, _end);
+    }
+    static const IRNodeType node_type_ = IRNodeType::myIndex;
+};
+
 
 /**
  * loop nest
@@ -877,6 +895,26 @@ class Move : public StmtNode, public std::enable_shared_from_this<Move> {
 
     static const IRNodeType node_type_ = IRNodeType::Move;
 };
+
+
+/*********************************************edited by WYH********************************/
+//a stmt that only contains one string as content
+class String_Stmt : public StmtNode, public std::enable_shared_from_this<String_Stmt>{
+public:
+    Expr value;
+
+    String_Stmt(Expr _value): StmtNode(IRNodeType::String_Stmt), value(_value){}
+
+    Stmt mutate_stmt(IRMutator *mutator) const;
+    void visit_node(IRVisitor *visitor) const;
+
+    static Stmt make(Expr _value){
+        return std::make_shared<const String_Stmt>(_value);
+    }
+    
+    static const IRNodeType node_type_=IRNodeType::String_Stmt;
+};
+/****************************************edit end*******************************************/
 
 
 enum class KernelType : uint8_t {

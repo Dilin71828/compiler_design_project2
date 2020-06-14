@@ -1,0 +1,406 @@
+FileData:
+indexs:
+i j 
+i j 
+i j 
+exprs:
+TEMP__1[i][j]=0;
+TEMP__1[i][j]=TEMP__1[i][j]+dC[i][j]*B[i][j];
+dA[i][j]=TEMP__1[i][j];
+result_code:
+  for( int i = 0; i < 4; i++){
+    for( int j = 0; j < 16; j++){
+      TEMP__1[i][j]=0;
+    }
+  }
+  for( int i = 0; i < 4; i++){
+    for( int j = 0; j < 16; j++){
+      TEMP__1[i][j]=TEMP__1[i][j]+dC[i][j]*B[i][j];
+    }
+  }
+  for( int i = 0; i < 4; i++){
+    for( int j = 0; j < 16; j++){
+      dA[i][j]=TEMP__1[i][j];
+    }
+  }
+FileData:
+indexs:
+i j 
+i j 
+i j 
+i j 
+__a j 
+__a j 
+__a j 
+__a j 
+__a j 
+__a j 
+__a j 
+__a j 
+exprs:
+TEMP__1[i][j]=0;
+TEMP__1[i][j]=TEMP__1[i][j]+dB[i][j];
+TEMP__1[i][j]=TEMP__1[i][j]+dA[i][j]/3.0;
+dB[i][j]=TEMP__1[i][j];
+TEMP__2[__a][j]=0;
+TEMP__2[__a][j]=TEMP__2[__a][j]+dB[__a][j];
+TEMP__2[__a][j]=TEMP__2[__a][j]+dA[__a-1][j]/3.0;
+dB[__a][j]=TEMP__2[__a][j];
+TEMP__3[__a][j]=0;
+TEMP__3[__a][j]=TEMP__3[__a][j]+dB[__a][j];
+TEMP__3[__a][j]=TEMP__3[__a][j]+dA[__a-2][j]/3.0;
+dB[__a][j]=TEMP__3[__a][j];
+result_code:
+  for( int i = 0; i < 10; i++){
+    for( int j = 0; j < 8; j++){
+      TEMP__1[i][j]=0;
+    }
+  }
+  for( int i = 0; i < 10; i++){
+    for( int j = 0; j < 8; j++){
+      TEMP__1[i][j]=TEMP__1[i][j]+dB[i][j];
+    }
+  }
+  for( int i = 0; i < 8; i++){
+    for( int j = 0; j < 8; j++){
+      TEMP__1[i][j]=TEMP__1[i][j]+dA[i][j]/3.0;
+    }
+  }
+  for( int i = 0; i < 10; i++){
+    for( int j = 0; j < 8; j++){
+      dB[i][j]=TEMP__1[i][j];
+    }
+  }
+  for( int __a = 0; __a < 10; __a++){
+    for( int j = 0; j < 8; j++){
+      TEMP__2[__a][j]=0;
+    }
+  }
+  for( int __a = 0; __a < 10; __a++){
+    for( int j = 0; j < 8; j++){
+      TEMP__2[__a][j]=TEMP__2[__a][j]+dB[__a][j];
+    }
+  }
+  for( int __a = 0; __a < 10; __a++){
+    for( int j = 0; j < 8; j++){
+      if (__a-1 < 8 && __a-1 >= 0) {
+        TEMP__2[__a][j]=TEMP__2[__a][j]+dA[__a-1][j]/3.0;
+      } else {
+        
+      }
+    }
+  }
+  for( int __a = 0; __a < 10; __a++){
+    for( int j = 0; j < 8; j++){
+      dB[__a][j]=TEMP__2[__a][j];
+    }
+  }
+  for( int __a = 0; __a < 10; __a++){
+    for( int j = 0; j < 8; j++){
+      TEMP__3[__a][j]=0;
+    }
+  }
+  for( int __a = 0; __a < 10; __a++){
+    for( int j = 0; j < 8; j++){
+      TEMP__3[__a][j]=TEMP__3[__a][j]+dB[__a][j];
+    }
+  }
+  for( int __a = 0; __a < 10; __a++){
+    for( int j = 0; j < 8; j++){
+      if (__a-2 < 8 && __a-2 >= 0) {
+        TEMP__3[__a][j]=TEMP__3[__a][j]+dA[__a-2][j]/3.0;
+      } else {
+        
+      }
+    }
+  }
+  for( int __a = 0; __a < 10; __a++){
+    for( int j = 0; j < 8; j++){
+      dB[__a][j]=TEMP__3[__a][j];
+    }
+  }
+FileData:
+indexs:
+i j 
+i j 
+i j 
+i j 
+i j 
+i j 
+i j 
+exprs:
+TEMP__1[i][j]=0;
+TEMP__1[i][j]=TEMP__1[i][j]+dB[i][j]*A[i][j];
+dA[i][j]=TEMP__1[i][j];
+TEMP__2[i][j]=0;
+TEMP__2[i][j]=TEMP__2[i][j]+A[i][j]*dB[i][j];
+TEMP__2[i][j]=TEMP__2[i][j]+dA[i][j];
+dA[i][j]=TEMP__2[i][j];
+result_code:
+  for( int i = 0; i < 4; i++){
+    for( int j = 0; j < 16; j++){
+      TEMP__1[i][j]=0;
+    }
+  }
+  for( int i = 0; i < 4; i++){
+    for( int j = 0; j < 16; j++){
+      TEMP__1[i][j]=TEMP__1[i][j]+dB[i][j]*A[i][j];
+    }
+  }
+  for( int i = 0; i < 4; i++){
+    for( int j = 0; j < 16; j++){
+      dA[i][j]=TEMP__1[i][j];
+    }
+  }
+  for( int i = 0; i < 4; i++){
+    for( int j = 0; j < 16; j++){
+      TEMP__2[i][j]=0;
+    }
+  }
+  for( int i = 0; i < 4; i++){
+    for( int j = 0; j < 16; j++){
+      TEMP__2[i][j]=TEMP__2[i][j]+A[i][j]*dB[i][j];
+    }
+  }
+  for( int i = 0; i < 4; i++){
+    for( int j = 0; j < 16; j++){
+      TEMP__2[i][j]=TEMP__2[i][j]+dA[i][j];
+    }
+  }
+  for( int i = 0; i < 4; i++){
+    for( int j = 0; j < 16; j++){
+      dA[i][j]=TEMP__2[i][j];
+    }
+  }
+FileData:
+indexs:
+i k 
+i k j 
+i k 
+exprs:
+TEMP__1[i][k]=0;
+TEMP__1[i][k]=TEMP__1[i][k]+dC[i][j]*B[k][j];
+dA[i][k]=TEMP__1[i][k];
+result_code:
+  for( int i = 0; i < 4; i++){
+    for( int k = 0; k < 16; k++){
+      TEMP__1[i][k]=0;
+    }
+  }
+  for( int i = 0; i < 4; i++){
+    for( int k = 0; k < 16; k++){
+      for( int j = 0; j < 16; j++){
+        TEMP__1[i][k]=TEMP__1[i][k]+dC[i][j]*B[k][j];
+      }
+    }
+  }
+  for( int i = 0; i < 4; i++){
+    for( int k = 0; k < 16; k++){
+      dA[i][k]=TEMP__1[i][k];
+    }
+  }
+FileData:
+indexs:
+i k 
+i k j 
+i k 
+k j 
+k j i 
+k j 
+exprs:
+TEMP__1[i][k]=0;
+TEMP__1[i][k]=TEMP__1[i][k]+dA[i][j]*C[k][j];
+dB[i][k]=TEMP__1[i][k];
+TEMP__2[k][j]=0;
+TEMP__2[k][j]=TEMP__2[k][j]+B[i][k]*dA[i][j];
+dC[k][j]=TEMP__2[k][j];
+result_code:
+  for( int i = 0; i < 16; i++){
+    for( int k = 0; k < 32; k++){
+      TEMP__1[i][k]=0;
+    }
+  }
+  for( int i = 0; i < 16; i++){
+    for( int k = 0; k < 32; k++){
+      for( int j = 0; j < 32; j++){
+        TEMP__1[i][k]=TEMP__1[i][k]+dA[i][j]*C[k][j];
+      }
+    }
+  }
+  for( int i = 0; i < 16; i++){
+    for( int k = 0; k < 32; k++){
+      dB[i][k]=TEMP__1[i][k];
+    }
+  }
+  for( int k = 0; k < 32; k++){
+    for( int j = 0; j < 32; j++){
+      TEMP__2[k][j]=0;
+    }
+  }
+  for( int k = 0; k < 32; k++){
+    for( int j = 0; j < 32; j++){
+      for( int i = 0; i < 16; i++){
+        TEMP__2[k][j]=TEMP__2[k][j]+B[i][k]*dA[i][j];
+      }
+    }
+  }
+  for( int k = 0; k < 32; k++){
+    for( int j = 0; j < 32; j++){
+      dC[k][j]=TEMP__2[k][j];
+    }
+  }
+FileData:
+indexs:
+i k l 
+i k l j 
+i k l 
+exprs:
+TEMP__1[i][k][l]=0;
+TEMP__1[i][k][l]=TEMP__1[i][k][l]+dA[i][j]*C[k][j]*D[l][j];
+dB[i][k][l]=TEMP__1[i][k][l];
+result_code:
+  for( int i = 0; i < 16; i++){
+    for( int k = 0; k < 32; k++){
+      for( int l = 0; l < 4; l++){
+        TEMP__1[i][k][l]=0;
+      }
+    }
+  }
+  for( int i = 0; i < 16; i++){
+    for( int k = 0; k < 32; k++){
+      for( int l = 0; l < 4; l++){
+        for( int j = 0; j < 32; j++){
+          TEMP__1[i][k][l]=TEMP__1[i][k][l]+dA[i][j]*C[k][j]*D[l][j];
+        }
+      }
+    }
+  }
+  for( int i = 0; i < 16; i++){
+    for( int k = 0; k < 32; k++){
+      for( int l = 0; l < 4; l++){
+        dB[i][k][l]=TEMP__1[i][k][l];
+      }
+    }
+  }
+FileData:
+indexs:
+n c __a __b 
+n c __a __b k p q 
+n c __a __b 
+exprs:
+TEMP__1[n][c][__a][__b]=0;
+TEMP__1[n][c][__a][__b]=TEMP__1[n][c][__a][__b]+dA[n][k][p][q]*C[k][c][__a-p][__b-q];
+dB[n][c][__a][__b]=TEMP__1[n][c][__a][__b];
+result_code:
+  for( int n = 0; n < 2; n++){
+    for( int c = 0; c < 16; c++){
+      for( int __a = 0; __a < 7; __a++){
+        for( int __b = 0; __b < 7; __b++){
+          TEMP__1[n][c][__a][__b]=0;
+        }
+      }
+    }
+  }
+  for( int n = 0; n < 2; n++){
+    for( int c = 0; c < 16; c++){
+      for( int __a = 0; __a < 7; __a++){
+        for( int __b = 0; __b < 7; __b++){
+          for( int k = 0; k < 8; k++){
+            for( int p = 0; p < 5; p++){
+              for( int q = 0; q < 5; q++){
+                if (__a-p < 3 && __a-p >= 0 && __b-q < 3 && __b-q >= 0) {
+                  TEMP__1[n][c][__a][__b]=TEMP__1[n][c][__a][__b]+dA[n][k][p][q]*C[k][c][__a-p][__b-q];
+                } else {
+                  
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  for( int n = 0; n < 2; n++){
+    for( int c = 0; c < 16; c++){
+      for( int __a = 0; __a < 7; __a++){
+        for( int __b = 0; __b < 7; __b++){
+          dB[n][c][__a][__b]=TEMP__1[n][c][__a][__b];
+        }
+      }
+    }
+  }
+FileData:
+indexs:
+j i 
+j i 
+j i 
+exprs:
+TEMP__1[j][i]=0;
+TEMP__1[j][i]=TEMP__1[j][i]+dB[i][j];
+dA[j][i]=TEMP__1[j][i];
+result_code:
+  for( int j = 0; j < 32; j++){
+    for( int i = 0; i < 16; i++){
+      TEMP__1[j][i]=0;
+    }
+  }
+  for( int j = 0; j < 32; j++){
+    for( int i = 0; i < 16; i++){
+      TEMP__1[j][i]=TEMP__1[j][i]+dB[i][j];
+    }
+  }
+  for( int j = 0; j < 32; j++){
+    for( int i = 0; i < 16; i++){
+      dA[j][i]=TEMP__1[j][i];
+    }
+  }
+FileData:
+indexs:
+__a __b 
+__a __b 
+__a __b 
+exprs:
+TEMP__1[__a][__b]=0;
+TEMP__1[__a][__b]=TEMP__1[__a][__b]+dB[__a*16+__b];
+dA[__a][__b]=TEMP__1[__a][__b];
+result_code:
+  for( int __a = 0; __a < 2; __a++){
+    for( int __b = 0; __b < 16; __b++){
+      TEMP__1[__a][__b]=0;
+    }
+  }
+  for( int __a = 0; __a < 2; __a++){
+    for( int __b = 0; __b < 16; __b++){
+      if (__a*16+__b < 32 && __a*16+__b >= 0) {
+        TEMP__1[__a][__b]=TEMP__1[__a][__b]+dB[__a*16+__b];
+      } else {
+        
+      }
+    }
+  }
+  for( int __a = 0; __a < 2; __a++){
+    for( int __b = 0; __b < 16; __b++){
+      dA[__a][__b]=TEMP__1[__a][__b];
+    }
+  }
+FileData:
+indexs:
+i 
+i j 
+i 
+exprs:
+TEMP__1[i]=0;
+TEMP__1[i]=TEMP__1[i]+dB[i][j];
+dA[i]=TEMP__1[i];
+result_code:
+  for( int i = 0; i < 4; i++){
+    TEMP__1[i]=0;
+  }
+  for( int i = 0; i < 4; i++){
+    for( int j = 0; j < 6; j++){
+      TEMP__1[i]=TEMP__1[i]+dB[i][j];
+    }
+  }
+  for( int i = 0; i < 4; i++){
+    dA[i]=TEMP__1[i];
+  }

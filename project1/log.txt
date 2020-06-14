@@ -1,0 +1,389 @@
+FileData:
+indexs:
+i j 
+i j 
+i j 
+exprs:
+TEMP__1[i][j]=0;
+TEMP__1[i][j]=TEMP__1[i][j]+2;
+A[i][j]=TEMP__1[i][j];
+result_code:
+  for( int i = 0; i < 32; i++){
+    for( int j = 0; j < 16; j++){
+      TEMP__1[i][j]=0;
+    }
+  }
+  for( int i = 0; i < 32; i++){
+    for( int j = 0; j < 16; j++){
+      TEMP__1[i][j]=TEMP__1[i][j]+2;
+    }
+  }
+  for( int i = 0; i < 32; i++){
+    for( int j = 0; j < 16; j++){
+      A[i][j]=TEMP__1[i][j];
+    }
+  }
+FileData:
+indexs:
+i j 
+i j 
+i j 
+exprs:
+TEMP__1[i][j]=0;
+TEMP__1[i][j]=TEMP__1[i][j]+(B[i][j]+B[i+1][j]+B[i+2][j])/3;
+A[i][j]=TEMP__1[i][j];
+result_code:
+  for( int i = 0; i < 8; i++){
+    for( int j = 0; j < 8; j++){
+      TEMP__1[i][j]=0;
+    }
+  }
+  for( int i = 0; i < 8; i++){
+    for( int j = 0; j < 8; j++){
+      if (i+1 < 10 && i+2 < 10) {
+        TEMP__1[i][j]=TEMP__1[i][j]+(B[i][j]+B[i+1][j]+B[i+2][j])/3;
+      } else {
+        
+      }
+    }
+  }
+  for( int i = 0; i < 8; i++){
+    for( int j = 0; j < 8; j++){
+      A[i][j]=TEMP__1[i][j];
+    }
+  }
+FileData:
+indexs:
+i j 
+i j 
+i j 
+i j 
+exprs:
+TEMP__1[i][j]=0;
+TEMP__1[i][j]=TEMP__1[i][j]+A[i][j];
+TEMP__1[i][j]=TEMP__1[i][j]+2;
+A[i][j]=TEMP__1[i][j];
+result_code:
+  for( int i = 0; i < 16; i++){
+    for( int j = 0; j < 8; j++){
+      TEMP__1[i][j]=0;
+    }
+  }
+  for( int i = 0; i < 16; i++){
+    for( int j = 0; j < 8; j++){
+      TEMP__1[i][j]=TEMP__1[i][j]+A[i][j];
+    }
+  }
+  for( int i = 0; i < 16; i++){
+    for( int j = 0; j < 8; j++){
+      TEMP__1[i][j]=TEMP__1[i][j]+2;
+    }
+  }
+  for( int i = 0; i < 16; i++){
+    for( int j = 0; j < 8; j++){
+      A[i][j]=TEMP__1[i][j];
+    }
+  }
+FileData:
+indexs:
+i j 
+i j 
+i j 
+i j 
+exprs:
+TEMP__1[i][j]=0;
+TEMP__1[i][j]=TEMP__1[i][j]+B[i][j];
+TEMP__1[i][j]=TEMP__1[i][j]+C[i][j];
+A[i][j]=TEMP__1[i][j];
+result_code:
+  for( int i = 0; i < 16; i++){
+    for( int j = 0; j < 32; j++){
+      TEMP__1[i][j]=0;
+    }
+  }
+  for( int i = 0; i < 16; i++){
+    for( int j = 0; j < 32; j++){
+      TEMP__1[i][j]=TEMP__1[i][j]+B[i][j];
+    }
+  }
+  for( int i = 0; i < 16; i++){
+    for( int j = 0; j < 32; j++){
+      TEMP__1[i][j]=TEMP__1[i][j]+C[i][j];
+    }
+  }
+  for( int i = 0; i < 16; i++){
+    for( int j = 0; j < 32; j++){
+      A[i][j]=TEMP__1[i][j];
+    }
+  }
+FileData:
+indexs:
+i j 
+i j 
+i j k 
+i j 
+exprs:
+TEMP__1[i][j]=0;
+TEMP__1[i][j]=TEMP__1[i][j]+A[i][j];
+TEMP__1[i][j]=TEMP__1[i][j]+B[i][k]*C[k][j];
+A[i][j]=TEMP__1[i][j];
+result_code:
+  for( int i = 0; i < 16; i++){
+    for( int j = 0; j < 32; j++){
+      TEMP__1[i][j]=0;
+    }
+  }
+  for( int i = 0; i < 16; i++){
+    for( int j = 0; j < 32; j++){
+      TEMP__1[i][j]=TEMP__1[i][j]+A[i][j];
+    }
+  }
+  for( int i = 0; i < 16; i++){
+    for( int j = 0; j < 32; j++){
+      for( int k = 0; k < 32; k++){
+        TEMP__1[i][j]=TEMP__1[i][j]+B[i][k]*C[k][j];
+      }
+    }
+  }
+  for( int i = 0; i < 16; i++){
+    for( int j = 0; j < 32; j++){
+      A[i][j]=TEMP__1[i][j];
+    }
+  }
+FileData:
+indexs:
+i j 
+i j 
+i j k 
+i j 
+i j 
+i j 
+i j 
+i j 
+exprs:
+TEMP__1[i][j]=0;
+TEMP__1[i][j]=TEMP__1[i][j]+A[i][j];
+TEMP__1[i][j]=TEMP__1[i][j]+alpha*(B[i][k]*C[k][j]);
+A[i][j]=TEMP__1[i][j];
+TEMP__2[i][j]=0;
+TEMP__2[i][j]=TEMP__2[i][j]+A[i][j];
+TEMP__2[i][j]=TEMP__2[i][j]+beta*D[i][j];
+A[i][j]=TEMP__2[i][j];
+result_code:
+  for( int i = 0; i < 16; i++){
+    for( int j = 0; j < 32; j++){
+      TEMP__1[i][j]=0;
+    }
+  }
+  for( int i = 0; i < 16; i++){
+    for( int j = 0; j < 32; j++){
+      TEMP__1[i][j]=TEMP__1[i][j]+A[i][j];
+    }
+  }
+  for( int i = 0; i < 16; i++){
+    for( int j = 0; j < 32; j++){
+      for( int k = 0; k < 32; k++){
+        TEMP__1[i][j]=TEMP__1[i][j]+alpha*(B[i][k]*C[k][j]);
+      }
+    }
+  }
+  for( int i = 0; i < 16; i++){
+    for( int j = 0; j < 32; j++){
+      A[i][j]=TEMP__1[i][j];
+    }
+  }
+  for( int i = 0; i < 16; i++){
+    for( int j = 0; j < 32; j++){
+      TEMP__2[i][j]=0;
+    }
+  }
+  for( int i = 0; i < 16; i++){
+    for( int j = 0; j < 32; j++){
+      TEMP__2[i][j]=TEMP__2[i][j]+A[i][j];
+    }
+  }
+  for( int i = 0; i < 16; i++){
+    for( int j = 0; j < 32; j++){
+      TEMP__2[i][j]=TEMP__2[i][j]+beta*D[i][j];
+    }
+  }
+  for( int i = 0; i < 16; i++){
+    for( int j = 0; j < 32; j++){
+      A[i][j]=TEMP__2[i][j];
+    }
+  }
+FileData:
+indexs:
+n k p q 
+n k p q 
+n k p q c r s 
+n k p q 
+exprs:
+TEMP__1[n][k][p][q]=0;
+TEMP__1[n][k][p][q]=TEMP__1[n][k][p][q]+A[n][k][p][q];
+TEMP__1[n][k][p][q]=TEMP__1[n][k][p][q]+B[n][c][p+r][q+s]*C[k][c][r][s];
+A[n][k][p][q]=TEMP__1[n][k][p][q];
+result_code:
+  for( int n = 0; n < 2; n++){
+    for( int k = 0; k < 8; k++){
+      for( int p = 0; p < 5; p++){
+        for( int q = 0; q < 5; q++){
+          TEMP__1[n][k][p][q]=0;
+        }
+      }
+    }
+  }
+  for( int n = 0; n < 2; n++){
+    for( int k = 0; k < 8; k++){
+      for( int p = 0; p < 5; p++){
+        for( int q = 0; q < 5; q++){
+          TEMP__1[n][k][p][q]=TEMP__1[n][k][p][q]+A[n][k][p][q];
+        }
+      }
+    }
+  }
+  for( int n = 0; n < 2; n++){
+    for( int k = 0; k < 8; k++){
+      for( int p = 0; p < 5; p++){
+        for( int q = 0; q < 5; q++){
+          for( int c = 0; c < 16; c++){
+            for( int r = 0; r < 3; r++){
+              for( int s = 0; s < 3; s++){
+                if (p+r < 7 && q+s < 7) {
+                  TEMP__1[n][k][p][q]=TEMP__1[n][k][p][q]+B[n][c][p+r][q+s]*C[k][c][r][s];
+                } else {
+                  
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  for( int n = 0; n < 2; n++){
+    for( int k = 0; k < 8; k++){
+      for( int p = 0; p < 5; p++){
+        for( int q = 0; q < 5; q++){
+          A[n][k][p][q]=TEMP__1[n][k][p][q];
+        }
+      }
+    }
+  }
+FileData:
+indexs:
+i j 
+i j 
+i j 
+exprs:
+TEMP__1[i][j]=0;
+TEMP__1[i][j]=TEMP__1[i][j]+A[j][i];
+B[i][j]=TEMP__1[i][j];
+result_code:
+  for( int i = 0; i < 16; i++){
+    for( int j = 0; j < 32; j++){
+      TEMP__1[i][j]=0;
+    }
+  }
+  for( int i = 0; i < 16; i++){
+    for( int j = 0; j < 32; j++){
+      TEMP__1[i][j]=TEMP__1[i][j]+A[j][i];
+    }
+  }
+  for( int i = 0; i < 16; i++){
+    for( int j = 0; j < 32; j++){
+      B[i][j]=TEMP__1[i][j];
+    }
+  }
+FileData:
+indexs:
+i j k 
+i j k 
+i j k 
+exprs:
+TEMP__1[i][j][k]=0;
+TEMP__1[i][j][k]=TEMP__1[i][j][k]+B[i][k];
+A[i][j][k]=TEMP__1[i][j][k];
+result_code:
+  for( int i = 0; i < 8; i++){
+    for( int j = 0; j < 2; j++){
+      for( int k = 0; k < 16; k++){
+        TEMP__1[i][j][k]=0;
+      }
+    }
+  }
+  for( int i = 0; i < 8; i++){
+    for( int j = 0; j < 2; j++){
+      for( int k = 0; k < 16; k++){
+        TEMP__1[i][j][k]=TEMP__1[i][j][k]+B[i][k];
+      }
+    }
+  }
+  for( int i = 0; i < 8; i++){
+    for( int j = 0; j < 2; j++){
+      for( int k = 0; k < 16; k++){
+        A[i][j][k]=TEMP__1[i][j][k];
+      }
+    }
+  }
+FileData:
+indexs:
+i j 
+i j 
+i j k l 
+i j 
+exprs:
+TEMP__1[i][j]=0;
+TEMP__1[i][j]=TEMP__1[i][j]+A[i][j];
+TEMP__1[i][j]=TEMP__1[i][j]+B[i][k][l]*C[k][j]*D[l][j];
+A[i][j]=TEMP__1[i][j];
+result_code:
+  for( int i = 0; i < 16; i++){
+    for( int j = 0; j < 32; j++){
+      TEMP__1[i][j]=0;
+    }
+  }
+  for( int i = 0; i < 16; i++){
+    for( int j = 0; j < 32; j++){
+      TEMP__1[i][j]=TEMP__1[i][j]+A[i][j];
+    }
+  }
+  for( int i = 0; i < 16; i++){
+    for( int j = 0; j < 32; j++){
+      for( int k = 0; k < 32; k++){
+        for( int l = 0; l < 8; l++){
+          TEMP__1[i][j]=TEMP__1[i][j]+B[i][k][l]*C[k][j]*D[l][j];
+        }
+      }
+    }
+  }
+  for( int i = 0; i < 16; i++){
+    for( int j = 0; j < 32; j++){
+      A[i][j]=TEMP__1[i][j];
+    }
+  }
+FileData:
+indexs:
+i j 
+i j 
+i j 
+exprs:
+TEMP__1[i][j]=0;
+TEMP__1[i][j]=TEMP__1[i][j]+C[i][j]*B[i][j];
+A[i][j]=TEMP__1[i][j];
+result_code:
+  for( int i = 0; i < 32; i++){
+    for( int j = 0; j < 16; j++){
+      TEMP__1[i][j]=0;
+    }
+  }
+  for( int i = 0; i < 32; i++){
+    for( int j = 0; j < 16; j++){
+      TEMP__1[i][j]=TEMP__1[i][j]+C[i][j]*B[i][j];
+    }
+  }
+  for( int i = 0; i < 32; i++){
+    for( int j = 0; j < 16; j++){
+      A[i][j]=TEMP__1[i][j];
+    }
+  }
